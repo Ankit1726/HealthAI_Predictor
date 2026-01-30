@@ -1,3 +1,10 @@
+# ===============================
+# HealthAI Predictor - Final App
+# ===============================
+
+import matplotlib
+matplotlib.use("Agg")
+
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -19,7 +26,9 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-body { background-color:#020617; }
+body {
+    background-color:#020617;
+}
 
 .title {
     font-size:38px;
@@ -73,14 +82,14 @@ scaler = joblib.load("scaler.pkl")
 # ----------------------------------
 # Header
 # ----------------------------------
-c1, c2 = st.columns([1,6])
+c1, c2 = st.columns([1, 6])
 
 with c1:
     st.image("logo.jpg", width=80)
 
 with c2:
     st.markdown("<div class='title'>HealthAI Predictor</div>", unsafe_allow_html=True)
-    st.markdown("<div class='subtitle'>AI powered medical risk analysis</div>", unsafe_allow_html=True)
+    st.markdown("<div class='subtitle'>AI Powered Medical Risk Analysis System</div>", unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -104,22 +113,24 @@ with b:
 with c:
     stress = st.slider("Stress Level", 1, 10, 5)
     exercise = st.slider("Exercise Hours", 0.0, 5.0, 1.0)
-    water = st.slider("Water Intake", 0.0, 6.0, 2.0)
+    water = st.slider("Water Intake (Litres)", 0.0, 6.0, 2.0)
 
-smoking = st.selectbox("Smoking", [0,1])
-alcohol = st.selectbox("Alcohol", [0,1])
-medical = st.selectbox("Medical History", [0,1])
+smoking = st.selectbox("Smoking", [0, 1])
+alcohol = st.selectbox("Alcohol", [0, 1])
+medical = st.selectbox("Medical History", [0, 1])
 
 # ----------------------------------
 # Prediction
 # ----------------------------------
 if st.button("📄 Generate Medical Report"):
 
-    X = np.array([[age,bmi,bp,0,glucose,heart,
-                   sleep,exercise,water,stress,
-                   smoking,alcohol,0,5,
-                   5,medical,0,
-                   0,0,0,0,0]])
+    X = np.array([[
+        age, bmi, bp, 0, glucose, heart,
+        sleep, exercise, water, stress,
+        smoking, alcohol, 0, 5,
+        5, medical, 0,
+        0, 0, 0, 0, 0
+    ]])
 
     X = scaler.transform(X)
 
@@ -129,24 +140,30 @@ if st.button("📄 Generate Medical Report"):
     st.markdown("## 🧠 AI Diagnosis Result")
 
     if pred == 1:
-        st.markdown(f"<div class='bad'>⚠️ High Health Risk<br>Probability: {prob:.2f}</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div class='bad'>⚠️ High Health Risk<br><b>Probability:</b> {prob:.2f}</div>",
+            unsafe_allow_html=True
+        )
     else:
-        st.markdown(f"<div class='good'>✅ Healthy Individual<br>Probability: {prob:.2f}</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div class='good'>✅ Healthy Individual<br><b>Probability:</b> {prob:.2f}</div>",
+            unsafe_allow_html=True
+        )
 
     # ----------------------------------
-    # Final report visuals
+    # Visual summary
     # ----------------------------------
     st.markdown("## 📊 Health Risk Summary")
 
     col1, col2 = st.columns(2)
 
-    # -------- Donut chart --------
+    # ---- Donut chart ----
     with col1:
         st.markdown("### 🧬 Risk Distribution")
 
-        fig, ax = plt.subplots(figsize=(3.2,3.2))
+        fig, ax = plt.subplots(figsize=(3.2, 3.2))
         ax.pie(
-            [prob, 1-prob],
+            [prob, 1 - prob],
             labels=["High Risk", "Healthy"],
             autopct="%1.0f%%",
             startangle=90,
@@ -155,22 +172,22 @@ if st.button("📄 Generate Medical Report"):
         ax.set_aspect("equal")
         st.pyplot(fig)
 
-    # -------- Small bar chart --------
+    # ---- Feature importance ----
     with col2:
-        st.markdown("### 🔍 Top Factors")
+        st.markdown("### 🔍 Top Risk Factors")
 
         fi = pd.DataFrame({
-            "Feature": ["BMI","Age","BP","Glucose","Stress"],
+            "Feature": ["BMI", "Age", "Blood Pressure", "Glucose", "Stress"],
             "Importance": sorted(model.feature_importances_, reverse=True)[:5]
         })
 
-        fig, ax = plt.subplots(figsize=(3.5,3))
+        fig, ax = plt.subplots(figsize=(3.6, 3))
         ax.barh(fi["Feature"], fi["Importance"])
         ax.invert_yaxis()
         st.pyplot(fig)
 
     # ----------------------------------
-    # Final assessment
+    # Final report
     # ----------------------------------
     st.markdown("## 🧾 Final Medical Assessment")
 
@@ -183,8 +200,8 @@ if st.button("📄 Generate Medical Report"):
     st.success(f"Overall Risk Category: {risk_level}")
 
     st.markdown("""
-    ✔ Model: Random Forest Classifier  
-    ✔ Analysis Type: Supervised Machine Learning  
-    ✔ Data Source: Clinical & Lifestyle Parameters  
-    ✔ Output: Individual Health Risk Score  
+    ✔ **Model:** Random Forest Classifier  
+    ✔ **Learning Type:** Supervised Machine Learning  
+    ✔ **Dataset:** Clinical + Lifestyle Health Records  
+    ✔ **Output:** Individual Health Risk Score  
     """)
