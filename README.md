@@ -8,7 +8,9 @@ The application predicts whether an individual is healthy or at high health risk
 ## 🚀 Live Demo
 
 🔗 **Live App:**  
-👉 https://your-streamlit-app-link-here  
+👉https://healthaipredictor-mxp5qtjwbecbskrfh6w6vp.streamlit.app
+
+
 ---
 
 ## 📌 Project Overview
